@@ -35,11 +35,40 @@ const LogoSvgWrapper = styled.div`
 `;
 
 const LogoSvg = () => (
-  <svg className="side-panel-logo__logo" width="22px" height="15px" viewBox="0 0 22 15">
-    <g transform="translate(11, -3) rotate(45.000000)">
-      <rect fill="#535C6C" x="0" y="5" width="10" height="10" />
-      <rect fill="#1FBAD6" x="5" y="0" width="10" height="10" />
-    </g>
+  <svg
+    width="20px"
+    height="20px"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="#ffffff"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <ellipse
+      cx="12"
+      cy="12"
+      rx="10"
+      ry="4"
+      transform="rotate(90 12 12)"
+      stroke="#ffffff"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M2 12H22"
+      stroke="#ffffff"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
   </svg>
 );
 interface KeplerGlLogoProps {
