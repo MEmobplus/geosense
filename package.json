@@ -94,7 +94,7 @@
     "clean": "rm -rf node_modules examples/**/node_modules website/node_modules .nyc_output coverage jest-coverage tape-coverage",
     "release:patch": "git add CHANGELOG.md && git commit -m 'updated CHANGELOG.md' && npm version patch && git push origin && git push origin --tags",
     "fix-dependencies": "./scripts/fix-dependencies.sh",
-    "start:prod": "yarn build && cd examples/demo-app && NODE_OPTIONS=--openssl-legacy-provider yarn build && npx serve -s dist -l 3000"
+    "start:prod": "env -u BASH_FUNC_which%% bash -c 'yarn build && cd examples/demo-app && NODE_OPTIONS=--openssl-legacy-provider yarn build && npx serve -s dist -l 3000'"
 
   },
   "files": [
