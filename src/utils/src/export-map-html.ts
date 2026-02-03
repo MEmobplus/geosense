@@ -393,7 +393,7 @@ export const exportMapToHTML = (options, version = KEPLER_GL_VERSION) => {
               options: {centerMap: false}
             })
           );
-        }, 500);
+        }, 100);
       }(KeplerGl, store));
     </script>
   </body>
