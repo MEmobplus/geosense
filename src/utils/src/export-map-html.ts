@@ -37,6 +37,52 @@ export const exportMapToHTML = (options, version = KEPLER_GL_VERSION) => {
     <style type="text/css">
       body {margin: 0; padding: 0; overflow: hidden;}
 
+      /* ================= MAP LOADER ================= */
+
+      #geosense-loader {
+        position: fixed;
+        inset: 0;
+        background: #0b0f14;
+        z-index: 10000000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity .45s ease, visibility .45s ease;
+      }
+
+      #geosense-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .geosense-loader-box {
+        text-align: center;
+        color: #ffffff;
+        font-family: "Uber Move","Helvetica Neue",Arial,sans-serif;
+      }
+
+      .geosense-spinner {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 6px solid rgba(255,255,255,0.15);
+        border-top: 6px solid #1FBAD6;
+        animation: geosenseSpin 1s linear infinite;
+        margin: auto;
+      }
+
+      .geosense-loader-text {
+        margin-top: 18px;
+        font-size: 18px;
+        letter-spacing: .5px;
+        color: #cfd8dc;
+      }
+
+      @keyframes geosenseSpin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
       /* Ensure our svg uses same sizing as kepler logo */
       .side-panel-logo svg {
         width: 20px !important;
@@ -293,6 +339,13 @@ export const exportMapToHTML = (options, version = KEPLER_GL_VERSION) => {
   </head>
 
   <body>
+    <!-- Geosense Loader -->
+    <div id="geosense-loader">
+      <div class="geosense-loader-box">
+        <div class="geosense-spinner"></div>
+        <div class="geosense-loader-text">Preparing Interactive Map…</div>
+      </div>
+    </div>
     <div id="app"></div>
 
     <script>
@@ -376,6 +429,39 @@ export const exportMapToHTML = (options, version = KEPLER_GL_VERSION) => {
         root.render(app);
       }(ReactDOM, app));
     </script>
+
+    <!-- Loader -->
+    <script>
+(function () {
+
+  function hideLoaderWhenKeplerReady() {
+
+    // Kepler UI root (always appears even with empty data)
+    const keplerRoot =
+      document.querySelector('#app .kepler-gl') ||
+      document.querySelector('#app > div > div');
+
+    if (keplerRoot) {
+
+      const loader = document.getElementById("geosense-loader");
+      if (loader) {
+        loader.classList.add("hidden");
+        setTimeout(() => loader.remove(), 500);
+      }
+      return;
+    }
+
+    requestAnimationFrame(hideLoaderWhenKeplerReady);
+  }
+
+  // start after render
+  window.addEventListener("load", function () {
+    setTimeout(hideLoaderWhenKeplerReady, 300);
+  });
+
+})();
+</script>
+    
 
     <!-- Load data + config -->
     <script>
