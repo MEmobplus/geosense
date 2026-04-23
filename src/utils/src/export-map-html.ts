@@ -37,6 +37,29 @@ export const exportMapToHTML = (options, version = KEPLER_GL_VERSION) => {
     <style type="text/css">
       body {margin: 0; padding: 0; overflow: hidden;}
 
+      /* ===== REMOVE KEPLER + MAPLIBRE ATTRIBUTION COMPLETELY ===== */
+
+      /* Kepler wrapper */
+      [class*="maplibre-attribution-container"] {
+        display: none !important;
+      }
+
+      [class*="mapbox-attribution-container"] {
+        display: none !important;
+      }
+
+      /* Backup: MapLibre native */
+      .maplibregl-ctrl-attrib,
+      .mapboxgl-ctrl-attrib {
+        display: none !important;
+      }
+
+      /* Remove bottom-right control container */
+      .maplibregl-ctrl-bottom-right,
+      .mapboxgl-ctrl-bottom-right {
+        display: none !important;
+      }
+
       /* ================= MAP LOADER ================= */
 
       #geosense-loader {
