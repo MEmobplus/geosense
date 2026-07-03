@@ -4,8 +4,22 @@
 // @ts-nocheck
 import {EXPORT_HTML_MAP_MODES, KEPLER_GL_VERSION} from '@kepler.gl/constants';
 
+// Default location of html-guard.min.js.
+// TESTING: relative path — place html-guard.min.js in the same folder as the
+// exported HTML file (or adjust the path below to match your local layout).
+// PRODUCTION: swap this to your CDN URL once you've uploaded the file, e.g.
+//   'https://cdn.yourdomain.com/vendor/html-guard.min.js'
+// Either way, you can always override per-export via options.htmlGuardUrl
+// without touching this constant.
+const DEFAULT_HTML_GUARD_URL = 'https://assets.allpings.com/html-guard.js';
+
 export const exportMapToHTML = (options, version = KEPLER_GL_VERSION) => {
   const isReadMode = options.mode === EXPORT_HTML_MAP_MODES.READ;
+
+  // Set options.protect = false to ship an export with no anti-copy layer
+  // (e.g. for internal/debug builds).
+  const protectEnabled = options.protect !== false;
+  const htmlGuardUrl = options.htmlGuardUrl || DEFAULT_HTML_GUARD_URL;
 
   return `
 <!DOCTYPE html>
@@ -13,6 +27,57 @@ export const exportMapToHTML = (options, version = KEPLER_GL_VERSION) => {
   <head>
     <meta charset="UTF-8"/>
     <title>Geosense</title>
+
+    ${
+      protectEnabled
+        ? `<!-- HTML Guard: obfuscation + anti-copy annoyance tactics. Load first, before anything else. -->
+    <script src="${htmlGuardUrl}"></script>
+    <script>
+      (function () {
+        if (typeof HtmlGuard === 'undefined') return; // fail open if CDN blocked/offline
+
+        // Reload the page if DevTools is opened
+        HtmlGuard.protections.antiDevTools();
+
+        // Disable right-click context menu
+        HtmlGuard.protections.blockContextMenu();
+
+        // Disable dragging elements (images, map tiles, etc.) out of the page
+        HtmlGuard.protections.blockDrag();
+
+        // Disable text/element selection
+        HtmlGuard.protections.blockSelection();
+
+        // Silence console.log/debug/warn/error/dir/etc.
+        HtmlGuard.protections.blockConsoleOutput();
+      })();
+    </script>
+    <!-- Shortcut-key blocker: HtmlGuard doesn't ship one, so this is custom. -->
+    <!-- Covers Windows/Linux (Ctrl) and macOS (Cmd/Meta) across Chrome/Edge/Firefox/Safari. -->
+    <script>
+      (function () {
+        document.addEventListener('keydown', function (e) {
+          var k = (e.key || '').toLowerCase();
+          var ctrlOrCmd = e.ctrlKey || e.metaKey;
+          var block = Boolean(
+            e.key === 'F12' ||
+            // DevTools / console / network panel:
+            // Win-Linux Chrome & Firefox = Ctrl+Shift+I/J/C/K/E/M, Mac = Cmd+Opt+I/J/C
+            (e.shiftKey && ctrlOrCmd && ['i', 'j', 'c', 'k', 'e', 'm'].indexOf(k) !== -1) ||
+            (e.altKey && e.metaKey && ['i', 'j', 'c', 'u'].indexOf(k) !== -1) ||
+            // View-source / Save page / Print
+            (ctrlOrCmd && !e.shiftKey && ['u', 's', 'p'].indexOf(k) !== -1)
+          );
+          if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+        }, { capture: true });
+      })();
+    </script>`
+        : ''
+    }
 
     <!--Uber Font-->
     <link rel="stylesheet" href="https://d1a3f4spazzrp4.cloudfront.net/kepler.gl/uber-fonts/4.0.0/superfine.css">
@@ -361,7 +426,7 @@ export const exportMapToHTML = (options, version = KEPLER_GL_VERSION) => {
     </script>
   </head>
 
-  <body>
+  <body style="position:fixed">
     <!-- Geosense Loader -->
     <div id="geosense-loader">
       <div class="geosense-loader-box">
